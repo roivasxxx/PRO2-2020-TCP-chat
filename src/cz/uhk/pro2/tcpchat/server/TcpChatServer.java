@@ -35,14 +35,21 @@ public class TcpChatServer implements MessageBroacaster {
     }
 
     @Override
-    public void broadcastMessage(String message) {
+    public void broadcastMessage(String message, int port) {
+
         // TODO DU 3.11.2020 neposilat zpravu tomu, kdo ji odelal (puvodci)
+
         synchronized (connectedClients) {
             for (Socket s : connectedClients) {
                 try {
-                    OutputStream os = s.getOutputStream();
-                    PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
-                    w.println(message);
+
+                    if (s.getPort() == port) continue;
+                    else {
+                        OutputStream os = s.getOutputStream();
+                        PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
+                        w.println(message);
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
