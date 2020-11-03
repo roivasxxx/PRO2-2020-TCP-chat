@@ -28,7 +28,7 @@ public class TcpServerUserThread extends Thread {
             while ((message  = reader.readLine()) != null) {
                 // TODO DU 3.11.2020
                 //    zprava "/time" od klienta -> odpovime mu, kolik je hodin
-                //    zprava "/quit" od klienta -> ukoncime komunikaci s klientem (vyskocime z while cyklu)
+                //    zprava "/quit" od klienta -> ukoncime komunikaci s klientem (vyskocime z cyklu while)
                 System.out.println("New message received: " + message + " " + connectedClientSocket);
                 broacaster.broadcastMessage(message);
             }
