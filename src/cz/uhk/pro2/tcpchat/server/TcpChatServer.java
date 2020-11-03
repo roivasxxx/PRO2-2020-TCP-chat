@@ -36,7 +36,7 @@ public class TcpChatServer implements MessageBroacaster {
 
     @Override
     public void broadcastMessage(String message) {
-        // TODO DU 3.11.2020 neposilat zpravu tomu, kdo ji odelal (puvodci)
+        // TODO DU 3.11.2020 neposilat zpravu tomu, kdo ji odeslal (puvodci)
         synchronized (connectedClients) {
             for (Socket s : connectedClients) {
                 try {
