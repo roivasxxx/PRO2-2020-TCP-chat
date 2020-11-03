@@ -1,40 +1,57 @@
 package cz.uhk.pro2.tcpchat.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
-/**
- * Thread that handles a single connected client
- */
 public class TcpServerUserThread extends Thread {
-    private final Socket connectedClientSocket;
-    private final MessageBroacaster broacaster;
+    private final Socket connectedClient;
+    private final MessageBroadcaster tcpChatServer;
 
-    public TcpServerUserThread(Socket connectedClientSocket, MessageBroacaster broadcaster) {
-        this.connectedClientSocket = connectedClientSocket;
-        this.broacaster = broadcaster;
+
+    public TcpServerUserThread(Socket connectedClient, MessageBroadcaster tcpChatServer) {
+        this.connectedClient = connectedClient;
+        this.tcpChatServer = tcpChatServer;
     }
+
 
     @Override
     public void run() {
         try {
-            InputStream is = connectedClientSocket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
+            InputStream inputStream = connectedClient.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String message;
-            while ((message  = reader.readLine()) != null) {
-                // TODO DU 3.11.2020
-                //    zprava "/time" od klienta -> odpovime mu, kolik je hodin
-                //    zprava "/quit" od klienta -> ukoncime komunikaci s klientem (vyskocime z while cyklu)
-                System.out.println("New message received: " + message + " " + connectedClientSocket);
-                broacaster.broadcastMessage(message);
+            while (!connectedClient.isClosed() && (message = reader.readLine()) != null) {
+                System.out.println("New message received: " + message + " " + connectedClient);
+                switch (message.toLowerCase()) {
+                    case "/time" -> writeMessage(connectedClient, "Aktuální čas je: " + (new Date()).toString());
+                    case "/quit" -> {
+                        writeMessage(connectedClient, "Odpojuji Vás...");
+                        connectedClient.close();
+                    }
+                    default -> tcpChatServer.broadcastMessage(connectedClient, message);
+                }
+
+
             }
-            System.out.println("UserThread ended " + connectedClientSocket);
+            System.out.println("Uzivatel " + connectedClient + " se odpojil");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void writeMessage(Socket socket, String message) {
+        try {
+            OutputStream os = socket.getOutputStream();
+            PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
+            w.println(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
