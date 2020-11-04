@@ -1,10 +1,7 @@
 package cz.uhk.pro2.tcpchat.server;
 
 import javax.swing.text.DateFormatter;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -40,9 +37,11 @@ public class TcpServerUserThread extends Thread {
 
                 switch (message) {
                     case "/time":
-                        SimpleDateFormat sdf = new SimpleDateFormat("mm:HH dd.MM.yy");
-                        String currentDate = new Date().toString();
-                        System.out.println(sdf.parse(currentDate));
+                        OutputStream os = connectedClientSocket.getOutputStream();
+                        PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
+                        w.println(new Date().toString());
+                        w.close();
+                        os.close();
                         break;
 
                     case "/quit":
@@ -54,7 +53,7 @@ public class TcpServerUserThread extends Thread {
                 }
             }
             System.out.println("UserThread ended " + connectedClientSocket);
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
