@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TcpChatServer implements MessageBroacaster {
     final List<Socket> connectedClients = new ArrayList<>();
-
+    
     public static void main(String[] args) {
         TcpChatServer s = new TcpChatServer();
         s.start();
@@ -35,18 +35,29 @@ public class TcpChatServer implements MessageBroacaster {
     }
 
     @Override
-    public void broadcastMessage(String message) {
+    public void broadcastMessage(String message,Socket sender) {
         // TODO DU 3.11.2020 neposilat zpravu tomu, kdo ji odeslal (puvodci)
         synchronized (connectedClients) {
-            for (Socket s : connectedClients) {
-                try {
-                    OutputStream os = s.getOutputStream();
-                    PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
-                    w.println(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+            if(message.toLowerCase().equals("/quit")){
+                System.out.println("Removing socket: " + sender);
+                connectedClients.remove(sender);
+            }
+            if(connectedClients.size()>0){
+                for (Socket s : connectedClients) {
+                    try {
+                     OutputStream os = s.getOutputStream();
+                        PrintWriter w = new PrintWriter(new OutputStreamWriter(os), true);
+                    
+                        if(s!=sender){
+                        w.println(message);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                 }
             }
+        }
+            
         }
     }
 }
