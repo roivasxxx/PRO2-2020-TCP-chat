@@ -31,7 +31,6 @@ public class TcpServerUserThread extends Thread {
             String message=null;
             do
              {
-               
                 message=reader.readLine();
                 // TODO DU 3.11.2020
                 //    zprava "/time" od klienta -> odpovime mu, kolik je hodin
@@ -40,6 +39,7 @@ public class TcpServerUserThread extends Thread {
                     break;
                 }
                 if(message.toLowerCase().equals("/time")){
+                    
                     broacaster.broadcastMessage(LocalTime.now().toString(),null);
                 }
                 if(message!=null){
@@ -53,7 +53,7 @@ public class TcpServerUserThread extends Thread {
             broacaster.broadcastMessage("/quit",connectedClientSocket);
             }
             
-            broacaster.broadcastMessage("Someone has left",null);
+            broacaster.broadcastMessage("Someone has left ",null);
             System.out.println("UserThread ended " + connectedClientSocket);
 
             
