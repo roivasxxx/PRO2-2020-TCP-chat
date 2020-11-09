@@ -47,7 +47,7 @@ public class TcpServerUserThread extends Thread {
                 broacaster.broadcastMessage(message,connectedClientSocket);
                 }
             }
-            while (!message.equals(""));
+            while(!message.equals(""));
             if(message.toLowerCase().equals("/quit")){
             System.out.println("New message received: " + message + " " + connectedClientSocket);
             broacaster.broadcastMessage("/quit",connectedClientSocket);
